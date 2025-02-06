@@ -14,10 +14,25 @@ import org.json.JSONObject;
 import java.util.stream.Collectors;
 
 /**
- * Skeleton of a ContinuousIntegrationServer which acts as webhook
- * See the Jetty documentation for API documentation of those classes.
+ * WebServer
+ * 
+ * This class is responsible for handling incoming HTTP requests.
+ * 
+ * It is used to handle the webhook from GitHub and start the CI process.
+ * 
+ * It also handles the root path to check if the server is running.
  */
 public class WebServer extends AbstractHandler {
+    /**
+     * Handle incoming HTTP requests
+     * 
+     * @param target      The target of the request
+     * @param baseRequest The base request
+     * @param request     The HTTP request
+     * @param response    The HTTP response
+     * @throws IOException
+     * @throws ServletException
+     */
     public void handle(String target,
             Request baseRequest,
             HttpServletRequest request,
@@ -34,19 +49,18 @@ public class WebServer extends AbstractHandler {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().println("<img src='https://http.cat/404' alt='404 not found' />");
         }
-        // response.setStatus(HttpServletResponse.SC_OK);
 
-        // here you do all the continuous integration tasks
-        // for example
-        // 1st clone your repository
-        // 2nd compile the code
-
-        // response.getWriter().println("CI job done");
-
+        // mark the request as handled, else the server will keep waiting
         baseRequest.setHandled(true);
-
     }
 
+    /**
+     * Handle incoming webhook from GitHub
+     * 
+     * @param request  The HTTP request
+     * @param response The HTTP response
+     * @throws IOException
+     */
     private void handleWebhook(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // get event type from environment variable
         String eventType = request.getHeader("X-GitHub-Event");
@@ -60,39 +74,55 @@ public class WebServer extends AbstractHandler {
             String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             JSONObject json = new JSONObject(body);
 
-            // print body and print json
-            // System.out.println(body);
-            // System.out.println(json);
-
+            // get git URL, commit hash, owner, and repo name
             String gitUrl = json.getJSONObject("repository").getString("clone_url");
             String commitHash = json.getString("after");
+            String owner = json.getJSONObject("repository").getJSONObject("owner").getString("name");
+            String repo = json.getJSONObject("repository").getString("name");
 
             // TODO: not hard code the repository URL
-            if (!gitUrl.equals("https://github.com/vilhelmprytz/dd2480-ci.git")) {
+            if (!gitUrl.equals("https://github.com/dd2480-2025-group7/ci.git")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
                 response.getWriter().println("Bad request, not supported repository");
                 return;
             }
 
+            // return accepted status, so github knows we received the webhook
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
             response.getWriter().println("Push event received");
 
-            // use storebuildresult to tell github that we've started working on the build
-            // of the commit
-
-            // process the webhook asynchrounously
-
+            // process the webhook asynchrounously, we don't want to block the server
             new Thread(() -> {
-                // create new project object
+                // create new store build result object
+                StoreBuildResult sbr = new StoreBuildResult();
+
+                // set status to building on GitHub
+                try {
+                    sbr.setStatusBuilding(commitHash, owner, repo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
+                } catch (org.apache.hc.core5.http.ParseException e) {
+                    e.printStackTrace();
+                }
+
+                // create new project object with git URL and commit hash
                 Project project = new Project(gitUrl, commitHash);
+
+                // run tests and get result
                 Boolean isSuccess = project.start();
 
-                // store build result
-                // StoreBuildResult storeBuildResult = new StoreBuildResult();
-                // storeBuildResult.storeBuildResult(isSuccess, commitHash);
+                // set status to complete on GitHub
+                try {
+                    sbr.setStatusComplete(commitHash, owner, repo, isSuccess);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }).start();
         } else {
+            // if event is not push, return bad request
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("Bad request, not supported event type");
         }

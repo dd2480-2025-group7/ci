@@ -5,21 +5,21 @@ import java.io.File;
 
 public class Project {
     private String url;
-    private String commit;
+    private String commitHash;
     private Git git;
 
-    public Project(String url, String commit) {
+    public Project(String url, String commitHash) {
         this.url = url;
-        this.commit = commit;
+        this.commitHash = commitHash;
     }
 
     // create main method that uses JGit to clone the repository
-    public static void main(String url, String commit) {
+    public static void main(String url, String commitHash) {
     }
 
     public boolean start() {
         System.out.println("Repo URL: " + url);
-        System.out.println("Commit: " + commit);
+        System.out.println("Commit: " + commitHash);
 
         String path = System.getProperty("user.home") + "/cirepo"; // clone repo inside users home directory
 
@@ -28,7 +28,7 @@ public class Project {
             git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
             // checkout specific commit
             // "git checkout < commit >"
-            git.checkout().setName(commit).call();
+            git.checkout().setName(commitHash).call();
 
             git.close();
         } catch (Exception e) {
@@ -42,13 +42,18 @@ public class Project {
         // return boolean based on test results
         boolean result = runMavenTests(path);
 
-        // delete the cloned repository, forecfully the whole directory using java
+        // TODO: delete the cloned repository, forcefully the whole directory using java
 
         // if tests pass, return true
         // if tests fail, return false
         return result;
     }
 
+    /**
+     * Runs Maven tests. If all tests pass, return true, else, return false.
+     * 
+     * @param path (String) The path to where the repo is cloned
+     */
     private boolean runMavenTests(String path) {
         int exitcode = -1;
         try {
