@@ -18,9 +18,6 @@ public class Project {
     }
 
     public boolean start() {
-        // create a new Git object
-        // git = Git.init().setDirectory("/path/to/repo").call();
-
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commit);
 
@@ -28,7 +25,7 @@ public class Project {
 
         System.out.println("Cloning repository to: " + path);
         try {
-            Git git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
+            git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
             // checkout specific commit
             // "git checkout < commit >"
             git.checkout().setName(commit).call();
@@ -74,7 +71,4 @@ public class Project {
             return false;
         }
     }
-
-    // create method here for running tests using maven
-    // run tests for specified project after cloning
 }
