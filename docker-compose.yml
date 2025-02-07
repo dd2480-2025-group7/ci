@@ -12,3 +12,4 @@ services:
       - ./private-key.pem:/usr/app/private-key.pem
     environment:
       - PRIVATE_KEY_PATH=/usr/app/private-key.pem
+      - APP_ID=${APP_ID} # read from .env file
