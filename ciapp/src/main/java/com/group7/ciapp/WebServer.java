@@ -12,15 +12,23 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.json.JSONObject;
 
 /**
- * WebServer
- * 
  * This class is responsible for handling incoming HTTP requests.
- * 
  * It is used to handle the webhook from GitHub and start the CI process.
- * 
  * It also handles the root path to check if the server is running.
  */
 public class WebServer extends AbstractHandler {
+    private static ConfigReader configReader;
+
+    /**
+     * Set configReader if null
+     */
+    public WebServer() {
+        if (configReader == null) {
+            configReader = new ConfigReader();
+            configReader.loadRepositories();
+        }
+    }
+
     /**
      * Handle incoming HTTP requests
      * 
@@ -78,8 +86,17 @@ public class WebServer extends AbstractHandler {
             String owner = json.getJSONObject("repository").getJSONObject("owner").getString("name");
             String repo = json.getJSONObject("repository").getString("name");
 
-            // TODO: not hard code the repository URL
-            if (!gitUrl.equals("https://github.com/dd2480-2025-group7/ci.git")) {
+            // check if repository URL is in the list of repositories
+            boolean found = false;
+            for (Repository repository : configReader.getRepositories()) {
+                if (repository.getUrl().equals(gitUrl)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            // if repository is not found, return bad request
+            if (!found) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
                 response.getWriter().println("Bad request, not supported repository");
@@ -96,11 +113,12 @@ public class WebServer extends AbstractHandler {
                 String jwt = TokenGetter.token(System.getenv("APP_ID"));
                 StoreBuildResult sbr = new StoreBuildResult(jwt);
 
-                Long check_id = null;
+                Long checkId = null;
 
                 // set status to building on GitHub
+
                 try {
-                    check_id = sbr.setStatusBuilding(commitHash, owner, repo);
+                    checkId = sbr.setStatusBuilding(commitHash, owner, repo);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (java.text.ParseException e) {
@@ -110,14 +128,17 @@ public class WebServer extends AbstractHandler {
                 }
 
                 // create new project object with git URL and commit hash
-                Project project = new Project(gitUrl, commitHash);
+                Project project = new Project(gitUrl, commitHash, checkId);
 
                 // run tests and get result
-                Boolean isSuccess = project.start();
+                String path = project.cloneRepo();
+                Boolean isSuccess = project.runMavenTests(path);
+                project.deleteRepo(path);
 
                 // set status to complete on GitHub
+
                 try {
-                    sbr.setStatusComplete(commitHash, owner, repo, isSuccess, check_id);
+                    sbr.setStatusComplete(commitHash, owner, repo, isSuccess, checkId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (org.apache.hc.core5.http.ParseException e) {

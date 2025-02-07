@@ -214,3 +214,6 @@ buildNumber.properties
 
 .env
 *.pem
+
+config.properties
+!ciapp/src/main/resources/config.properties
