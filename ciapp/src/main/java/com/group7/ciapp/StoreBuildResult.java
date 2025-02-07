@@ -68,7 +68,7 @@ public class StoreBuildResult {
         // Get JSON response as org.JSON.JSONObject
         String responseString = EntityUtils.toString(response.getEntity());
         JSONObject jsonResponse = new org.json.JSONObject(responseString);
-        Long checkID = jsonResponse.getInt("id");
+        Long checkID = jsonResponse.getLong("id");
         return checkID;
     }
 

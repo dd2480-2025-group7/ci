@@ -14,16 +14,16 @@ public class Project {
     private String url;
     private String commitHash;
     private Git git;
-    private int checkId;
+    private Long checkId;
 
     /**
      * Sets the URL, commit hash and check-ID of the repository.
      * 
      * @param url        (String) The URL to the repository.
      * @param commitHash (String) The commit hash to checkout.
-     * @param checkId    (int) The GitHub check ID.
+     * @param checkId    (Long) The GitHub check ID.
      */
-    public Project(String url, String commitHash, int checkId) {
+    public Project(String url, String commitHash, Long checkId) {
         this.url = url;
         this.commitHash = commitHash;
         this.checkId = checkId;
