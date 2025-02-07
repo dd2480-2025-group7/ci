@@ -93,10 +93,10 @@ public class WebServer extends AbstractHandler {
             // process the webhook asynchrounously, we don't want to block the server
             new Thread(() -> {
                 // create new store build result object
-                String jwt = JWTGenerator.token(System.getenv("APP_ID"));
+                String jwt = TokenGetter.token(System.getenv("APP_ID"));
                 StoreBuildResult sbr = new StoreBuildResult(jwt);
 
-                int check_id = 0;
+                Long check_id = null;
 
                 // set status to building on GitHub
                 try {
@@ -119,6 +119,8 @@ public class WebServer extends AbstractHandler {
                 try {
                     sbr.setStatusComplete(commitHash, owner, repo, isSuccess, check_id);
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (org.apache.hc.core5.http.ParseException e) {
                     e.printStackTrace();
                 }
             }).start();

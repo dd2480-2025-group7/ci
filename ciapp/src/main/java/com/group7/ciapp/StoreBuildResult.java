@@ -37,7 +37,7 @@ public class StoreBuildResult {
      * @throws IOException
      * @throws org.apache.hc.core5.http.ParseException
      */
-    public int setStatusBuilding(String commitHash, String owner, String repo)
+    public Long setStatusBuilding(String commitHash, String owner, String repo)
             throws IOException, ParseException, org.apache.hc.core5.http.ParseException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost request = new HttpPost(String.format("https://api.github.com/repos/%s/%s/check-runs", owner, repo));
@@ -60,7 +60,8 @@ public class StoreBuildResult {
         // Get JSON response as org.JSON.JSONObject
         String responseString = EntityUtils.toString(response.getEntity());
         JSONObject jsonResponse = new org.json.JSONObject(responseString);
-        int check_id = jsonResponse.getInt("id");
+        Long check_id = jsonResponse.getLong("id");
+
         return check_id;
     }
 
@@ -76,27 +77,29 @@ public class StoreBuildResult {
      * @return
      * @throws IOException
      */
-    public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, int check_id)
-            throws IOException {
+    public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, Long check_id)
+            throws IOException, org.apache.hc.core5.http.ParseException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPatch request = new HttpPatch(
                 String.format("https://api.github.com/repos/%s/%s/check-runs/%d", owner, repo, check_id));
+
         request.setHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.github_token);
         request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         String jsonBody = "{"
                 + "\"status\": \"completed\","
-                + "\"conclusion\": \"" + isSuccess + "\","
+                + "\"conclusion\": \"" + ((isSuccess) ? "success" : "failure") + "\","
                 + "\"output\": {"
-                + "   \"title\": \"Build Passed\","
+                + "   \"title\": \"Build " + ((isSuccess) ? "success" : "failure") + "\","
                 + "   \"summary\": \"The build and tests passed successfully.\""
                 + "}"
                 + "}";
         request.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
         CloseableHttpResponse response = client.execute(request);
 
-        // print response data in JSON
-        System.out.println(response);
+        // Get JSON response as org.JSON.JSONObject
+        String responseString = EntityUtils.toString(response.getEntity());
+        JSONObject jsonResponse = new org.json.JSONObject(responseString);
     }
     // store build logs in a file
 }
