@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Reads the configuration file and loads the repositories.
+ * This class reads the configuration file and loads the repositories.
  */
 public class ConfigReader {
     private Properties properties = new Properties();

@@ -14,8 +14,6 @@ import org.json.JSONObject;
 import java.util.stream.Collectors;
 
 /**
- * WebServer
- * 
  * This class is responsible for handling incoming HTTP requests.
  * It is used to handle the webhook from GitHub and start the CI process.
  * It also handles the root path to check if the server is running.
@@ -24,7 +22,7 @@ public class WebServer extends AbstractHandler {
     private static ConfigReader configReader;
 
     /**
-     * Constructor for WebServer
+     * Set configReader if null
      */
     public WebServer() {
         if (configReader == null) {

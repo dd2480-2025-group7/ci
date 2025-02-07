@@ -16,8 +16,6 @@ import org.apache.hc.core5.http.ContentType;
 import org.json.JSONObject;
 
 /**
- * StoreBuildResult class
- * 
  * This class is responsible for storing the build result and sending it to the
  * GitHub API.
  */
@@ -25,7 +23,7 @@ public class StoreBuildResult {
     private String github_token;
 
     /**
-     * Constructor for StoreBuildResult
+     * Get github token from environment variable.
      */
     public StoreBuildResult() {
         // Get the environment variable
@@ -38,17 +36,18 @@ public class StoreBuildResult {
     }
 
     /**
-     * post request to GitHub API to flag commit as success or failure
+     * Post request to GitHub API to flag commit as success or failure.
      * 
-     * @param commitHash (String) The hash of the commit being tested
+     * @param commitHash (String) The hash of the commit being tested.
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
-     * @return (int) The check ID of the check run
+     * @return (int) The check ID of the check run.
      * @throws IOException
+     * @throws ParseException
      * @throws org.apache.hc.core5.http.ParseException
      */
     public int setStatusBuilding(String commitHash, String owner, String repo)
-            throws IOException, org.apache.hc.core5.http.ParseException {
+            throws IOException, ParseException, org.apache.hc.core5.http.ParseException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost request = new HttpPost(String.format("https://api.github.com/repos/%s/%s/check-runs", owner, repo));
         request.setHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
@@ -79,11 +78,11 @@ public class StoreBuildResult {
      * If successful, set "conclusion" to success. Otherwise, set "conclusion" to
      * failure.
      * 
-     * @param commitHash (String) The hash of the commit being tested
+     * @param commitHash (String) The hash of the commit being tested.
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
      * @param isSuccess  (boolean) Says whether the tests passsed or not.
-     * @throws IOException if an error occurs while sending the request
+     * @throws IOException if an error occurs while sending the request.
      */
     public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, int checkID)
             throws IOException {

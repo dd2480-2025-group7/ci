@@ -3,15 +3,13 @@ package com.group7.ciapp;
 import org.eclipse.jetty.server.Server;
 
 /**
- * App
- * 
  * This class is responsible for starting the server and listening for incoming
  * requests.
  */
 public class App {
 
     /**
-     * Starts the server and listens for incoming requests
+     * Starts the server and listens for incoming requests.
      * 
      * @param args
      * @throws Exception

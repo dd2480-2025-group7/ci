@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 
 /**
- * Project class
- * 
  * This class is responsible for cloning a repository, checking out a specific
  * commit hash, running tests and deleting the cloned repository.
  */
@@ -19,11 +17,11 @@ public class Project {
     private int checkId;
 
     /**
-     * Constructor for Project
+     * Sets the URL, commit hash and check-ID of the repository.
      * 
-     * @param url        (String) The URL to the repository
-     * @param commitHash (String) The commit hash to checkout
-     * @param checkId    (int) The GitHub check ID
+     * @param url        (String) The URL to the repository.
+     * @param commitHash (String) The commit hash to checkout.
+     * @param checkId    (int) The GitHub check ID.
      */
     public Project(String url, String commitHash, int checkId) {
         this.url = url;
@@ -32,9 +30,9 @@ public class Project {
     }
 
     /**
-     * Clone the repository from the given URL and checkout the given commit hash
+     * Clone the repository from the given URL and checkout the given commit hash.
      * 
-     * @return (String) The path to the cloned repository. Null if an error occurs
+     * @return (String) The path to the cloned repository. Null if an error occurs.
      */
     public String cloneRepo() {
         System.out.println("Repo URL: " + url);
@@ -59,9 +57,9 @@ public class Project {
     }
 
     /**
-     * Delete the cloned repository
+     * Delete the cloned repository.
      * 
-     * @param path (String) The path to the cloned repository
+     * @param path (String) The path to the cloned repository.
      */
     public void deleteRepo(String path) {
         // Delete the cloned repository efter running tests
@@ -75,9 +73,9 @@ public class Project {
     }
 
     /**
-     * Recursively remove a file or directory from the given path
+     * Recursively remove a file or directory from the given path.
      * 
-     * @param f (File) The file or directory to remove
+     * @param f (File) The file or directory to remove.
      */
     private static void removeRecursively(File f) {
         if (f.isDirectory()) {
@@ -89,9 +87,9 @@ public class Project {
     }
 
     /**
-     * Runs Maven tests. If all tests pass, return true, else, return false.
+     * Run Maven tests. If all tests pass, return true, else, return false.
      * 
-     * @param path (String) The path to where the repo is cloned
+     * @param path (String) The path to the cloned repository.
      */
     public boolean runMavenTests(String path) {
         int exitcode = -1;
