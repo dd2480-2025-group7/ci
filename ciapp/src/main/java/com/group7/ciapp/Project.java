@@ -6,23 +6,37 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
+/**
+ * Project class
+ * 
+ * This class is responsible for cloning a repository, checking out a specific
+ * commit hash, running tests and deleting the cloned repository.
+ */
 public class Project {
     private String url;
     private String commitHash;
     private Git git;
     private int checkId;
 
+    /**
+     * Constructor for Project
+     * 
+     * @param url        (String) The URL to the repository
+     * @param commitHash (String) The commit hash to checkout
+     * @param checkId    (int) The GitHub check ID
+     */
     public Project(String url, String commitHash, int checkId) {
         this.url = url;
         this.commitHash = commitHash;
         this.checkId = checkId;
     }
 
-    // create main method that uses JGit to clone the repository
-    public static void main(String url, String commitHash) {
-    }
-
-    public String cloneRepo(){
+    /**
+     * Clone the repository from the given URL and checkout the given commit hash
+     * 
+     * @return (String) The path to the cloned repository. Null if an error occurs
+     */
+    public String cloneRepo() {
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commitHash);
         // Clone repo inside tmp directory
@@ -44,18 +58,23 @@ public class Project {
         }
     }
 
-    public void deleteRepo(String path){
+    /**
+     * Delete the cloned repository
+     * 
+     * @param path (String) The path to the cloned repository
+     */
+    public void deleteRepo(String path) {
         // Delete the cloned repository efter running tests
         this.git.close();
         this.git = null;
         Git.shutdown();
         File dir = new File(path);
-        // TODO: Try this while testing dir.mkdirs(); 
+        // TODO: Try this while testing dir.mkdirs();
         // Ensure the directory does not exists
         removeRecursively(dir);
     }
 
-     /**
+    /**
      * Recursively remove a file or directory from the given path
      * 
      * @param f (File) The file or directory to remove
@@ -86,7 +105,7 @@ public class Project {
             // Log from process
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
-            while((line = in.readLine()) != null){
+            while ((line = in.readLine()) != null) {
                 System.out.println(line);
             }
 
@@ -106,7 +125,4 @@ public class Project {
         }
     }
 
-    
-
-    
 }

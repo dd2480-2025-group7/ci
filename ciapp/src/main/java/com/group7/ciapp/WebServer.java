@@ -17,14 +17,15 @@ import java.util.stream.Collectors;
  * WebServer
  * 
  * This class is responsible for handling incoming HTTP requests.
- * 
  * It is used to handle the webhook from GitHub and start the CI process.
- * 
  * It also handles the root path to check if the server is running.
  */
 public class WebServer extends AbstractHandler {
     private static ConfigReader configReader;
 
+    /**
+     * Constructor for WebServer
+     */
     public WebServer() {
         if (configReader == null) {
             configReader = new ConfigReader();
@@ -118,7 +119,7 @@ public class WebServer extends AbstractHandler {
                 int checkId = 0;
 
                 // set status to building on GitHub
-                
+
                 try {
                     checkId = sbr.setStatusBuilding(commitHash, owner, repo);
                 } catch (IOException e) {
@@ -138,7 +139,7 @@ public class WebServer extends AbstractHandler {
                 project.deleteRepo(path);
 
                 // set status to complete on GitHub
-                
+
                 try {
                     sbr.setStatusComplete(commitHash, owner, repo, isSuccess, checkId);
                 } catch (IOException e) {
