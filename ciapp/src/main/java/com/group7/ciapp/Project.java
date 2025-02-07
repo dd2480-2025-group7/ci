@@ -7,10 +7,12 @@ public class Project {
     private String url;
     private String commitHash;
     private Git git;
+    private int checkId;
 
-    public Project(String url, String commitHash) {
+    public Project(String url, String commitHash, int checkId) {
         this.url = url;
         this.commitHash = commitHash;
+        this.checkId = checkId;
     }
 
     // create main method that uses JGit to clone the repository
@@ -21,16 +23,18 @@ public class Project {
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commitHash);
 
-        String path = System.getProperty("user.home") + "/cirepo"; // clone repo inside users home directory
-
+        // Clone repo inside tmp directory
+        String path = System.getProperty("java.io.tmpdir") + "/ci-tests/" + this.checkId;
+        File dir = new File(path);
+        dir.mkdirs(); // Ensure the directory exists
         System.out.println("Cloning repository to: " + path);
+
         try {
             git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
             // checkout specific commit
-            // "git checkout < commit >"
             git.checkout().setName(commitHash).call();
-
             git.close();
+
         } catch (Exception e) {
             System.out.println("Error cloning repository");
             // print exception code
@@ -39,14 +43,30 @@ public class Project {
         }
 
         // run tests for specified project after cloning
-        // return boolean based on test results
         boolean result = runMavenTests(path);
 
-        // TODO: delete the cloned repository, forcefully the whole directory using java
+        // Delete the cloned repository efter running tests
+        git.close();
+        git = null;
+        Git.shutdown();
+        removeRecursively(dir);
 
-        // if tests pass, return true
-        // if tests fail, return false
+        // if tests pass, return true. Otherwise, return false.
         return result;
+    }
+
+    /**
+     * Recursively remove a file or directory from the given path
+     * 
+     * @param f (File) The file or directory to remove
+     */
+    private static void removeRecursively(File f) {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles()) {
+                removeRecursively(c);
+            }
+        }
+        f.delete();
     }
 
     /**
