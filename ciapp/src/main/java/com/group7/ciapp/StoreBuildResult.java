@@ -15,27 +15,35 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.ContentType;
 import org.json.JSONObject;
 
+/**
+ * This class is responsible for storing the build result and sending it to the
+ * GitHub API.
+ */
 public class StoreBuildResult {
     private String github_token;
 
+    /**
+     * Get github token from environment variable.
+     */
     public StoreBuildResult() {
         // Get the environment variable
         this.github_token = System.getenv("GITHUB_ACCESS_TOKEN");
 
         // Check if the variable is set
         if (this.github_token == null) {
-            // very much error
+            // TODO: quit the program and throw an exception
         }
     }
 
     /**
-     * post request to GitHub API to flag commit as success or failure
+     * Post request to GitHub API to flag commit as success or failure.
      * 
-     * @param commitHash (String) The hash of the commit being tested
+     * @param commitHash (String) The hash of the commit being tested.
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
-     * @return
+     * @return (int) The check ID of the check run.
      * @throws IOException
+     * @throws ParseException
      * @throws org.apache.hc.core5.http.ParseException
      */
     public int setStatusBuilding(String commitHash, String owner, String repo)
@@ -61,8 +69,8 @@ public class StoreBuildResult {
         // Get JSON response as org.JSON.JSONObject
         String responseString = EntityUtils.toString(response.getEntity());
         JSONObject jsonResponse = new org.json.JSONObject(responseString);
-        int check_id = jsonResponse.getInt("id");
-        return check_id;
+        int checkID = jsonResponse.getInt("id");
+        return checkID;
     }
 
     /**
@@ -70,18 +78,17 @@ public class StoreBuildResult {
      * If successful, set "conclusion" to success. Otherwise, set "conclusion" to
      * failure.
      * 
-     * @param commitHash (String) The hash of the commit being tested
+     * @param commitHash (String) The hash of the commit being tested.
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
      * @param isSuccess  (boolean) Says whether the tests passsed or not.
-     * @return
-     * @throws IOException
+     * @throws IOException if an error occurs while sending the request.
      */
-    public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, int check_id)
+    public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, int checkID)
             throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPatch request = new HttpPatch(
-                String.format("https://api.github.com/repos/%s/%s/check-runs/%d", owner, repo, check_id));
+                String.format("https://api.github.com/repos/%s/%s/check-runs/%d", owner, repo, checkID));
         request.setHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.github_token);
         request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
@@ -99,5 +106,4 @@ public class StoreBuildResult {
         // print response data in JSON
         System.out.println(response);
     }
-    // store build logs in a file
 }
