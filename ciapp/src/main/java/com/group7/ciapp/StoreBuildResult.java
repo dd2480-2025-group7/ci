@@ -1,26 +1,25 @@
 package com.group7.ciapp;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.http.ContentType;
 import org.json.JSONObject;
 
 public class StoreBuildResult {
     private String github_token;
 
-    public StoreBuildResult() {
+    public StoreBuildResult(String jwt) {
         // Get the environment variable
-        this.github_token = System.getenv("GITHUB_ACCESS_TOKEN");
+        this.github_token = jwt;
 
         // Check if the variable is set
         if (this.github_token == null) {

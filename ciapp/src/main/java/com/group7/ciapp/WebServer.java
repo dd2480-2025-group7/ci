@@ -1,17 +1,15 @@
 package com.group7.ciapp;
 
+import java.io.IOException;
+import java.util.stream.Collectors;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-import java.io.IOException;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-
-import com.group7.ciapp.Project;
 import org.json.JSONObject;
-import java.util.stream.Collectors;
 
 /**
  * WebServer
@@ -95,7 +93,8 @@ public class WebServer extends AbstractHandler {
             // process the webhook asynchrounously, we don't want to block the server
             new Thread(() -> {
                 // create new store build result object
-                StoreBuildResult sbr = new StoreBuildResult();
+                String jwt = JWTGenerator.token(System.getenv("APP_ID"));
+                StoreBuildResult sbr = new StoreBuildResult(jwt);
 
                 int check_id = 0;
 
