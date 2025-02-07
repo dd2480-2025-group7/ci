@@ -15,8 +15,9 @@ public class JWTGenerator {
     
     public static String token(String app_id) {
         try {
-            File keyFile = new File("private-key.pem");
+            File keyFile = new File("../private-key.pem");
             String key = new String(Files.readAllBytes(keyFile.toPath()));
+            key = key.replace("-----BEGIN RSA PRIVATE KEY-----","").replace("-----END RSA PRIVATE KEY-----","").replace("\\s","");
             RSAPrivateKey privateKey = getPrivateKey(key);
 
             // Generate JWT
