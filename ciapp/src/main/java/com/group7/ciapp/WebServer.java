@@ -23,6 +23,15 @@ import java.util.stream.Collectors;
  * It also handles the root path to check if the server is running.
  */
 public class WebServer extends AbstractHandler {
+    private static ConfigReader configReader;
+
+    public WebServer() {
+        if (configReader == null) {
+            configReader = new ConfigReader();
+            configReader.loadRepositories();
+        }
+    }
+
     /**
      * Handle incoming HTTP requests
      * 
@@ -80,8 +89,17 @@ public class WebServer extends AbstractHandler {
             String owner = json.getJSONObject("repository").getJSONObject("owner").getString("name");
             String repo = json.getJSONObject("repository").getString("name");
 
-            // TODO: not hard code the repository URL
-            if (!gitUrl.equals("https://github.com/dd2480-2025-group7/ci.git")) {
+            // check if repository URL is in the list of repositories
+            boolean found = false;
+            for (Repository repository : configReader.getRepositories()) {
+                if (repository.getUrl().equals(gitUrl)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            // if repository is not found, return bad request
+            if (!found) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
                 response.getWriter().println("Bad request, not supported repository");
