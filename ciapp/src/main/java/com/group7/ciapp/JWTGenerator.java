@@ -11,23 +11,31 @@ import java.util.Date;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
+// openssl pkcs8 \
+//   -topk8 \
+//   -inform PEM \
+//   -outform PEM \
+//   -in original_key.pem \
+//   -out pkcs8_key.pem \
+//   -nocrypt
+
 public class JWTGenerator {
-    
+
     public static String token(String app_id) {
         try {
             File keyFile = new File("../private-key.pem");
             String key = new String(Files.readAllBytes(keyFile.toPath()));
-            key = key.replace("-----BEGIN RSA PRIVATE KEY-----","").replace("-----END RSA PRIVATE KEY-----","").replace("\\s","");
+            key = key.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
             RSAPrivateKey privateKey = getPrivateKey(key);
 
             // Generate JWT
             String jwt = JWT.create()
-                .withIssuer(app_id)
-                .withIssuedAt(new Date(System.currentTimeMillis() - 60 * 1000)) // 60s clock drift
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000)) // 10 min expiry
-                .sign(Algorithm.RSA256(null, privateKey));
+                    .withIssuer(app_id)
+                    .withIssuedAt(new Date(System.currentTimeMillis() - 60 * 1000)) // 60s clock drift
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000)) // 10 min expiry
+                    .sign(Algorithm.RSA256(null, privateKey));
 
-            
             return jwt;
         } catch (Exception e) {
             e.printStackTrace();
