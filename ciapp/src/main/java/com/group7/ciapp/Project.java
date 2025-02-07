@@ -50,7 +50,8 @@ public class Project {
         this.git = null;
         Git.shutdown();
         File dir = new File(path);
-        // TODO: Try this while testing dir.mkdirs(); // Ensure the directory exists
+        // TODO: Try this while testing dir.mkdirs(); 
+        // Ensure the directory does not exists
         removeRecursively(dir);
     }
 
