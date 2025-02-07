@@ -9,7 +9,7 @@ cat >"$JSON_FILE" <<EOL
 {
   "ref": "refs/heads/continued-work",
   "before": "9fdd5be7a8bf80f2fe79da5a28272117f2b3492b",
-  "after": "0000000000000000000000000000000000000000",
+  "after": "ac44719b86749ffc0ea55df88ba5390d7edb3043",
   "repository": {
     "id": 927046446,
     "node_id": "R_kgDON0GbLg",

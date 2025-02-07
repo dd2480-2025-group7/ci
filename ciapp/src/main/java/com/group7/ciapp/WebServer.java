@@ -118,6 +118,7 @@ public class WebServer extends AbstractHandler {
                 int checkId = 0;
 
                 // set status to building on GitHub
+                
                 try {
                     checkId = sbr.setStatusBuilding(commitHash, owner, repo);
                 } catch (IOException e) {
@@ -132,9 +133,12 @@ public class WebServer extends AbstractHandler {
                 Project project = new Project(gitUrl, commitHash, checkId);
 
                 // run tests and get result
-                Boolean isSuccess = project.start();
+                String path = project.cloneRepo();
+                Boolean isSuccess = project.runMavenTests(path);
+                project.deleteRepo(path);
 
                 // set status to complete on GitHub
+                
                 try {
                     sbr.setStatusComplete(commitHash, owner, repo, isSuccess, checkId);
                 } catch (IOException e) {
