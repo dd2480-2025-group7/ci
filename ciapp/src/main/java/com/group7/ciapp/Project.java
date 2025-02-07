@@ -1,7 +1,10 @@
 package com.group7.ciapp;
 
 import org.eclipse.jgit.api.Git;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 
 public class Project {
     private String url;
@@ -19,43 +22,40 @@ public class Project {
     public static void main(String url, String commitHash) {
     }
 
-    public boolean start() {
+    public String cloneRepo(){
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commitHash);
-
         // Clone repo inside tmp directory
         String path = System.getProperty("java.io.tmpdir") + "/ci-tests/" + this.checkId;
-        File dir = new File(path);
-        dir.mkdirs(); // Ensure the directory exists
         System.out.println("Cloning repository to: " + path);
 
         try {
-            git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
+            this.git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
             // checkout specific commit
-            git.checkout().setName(commitHash).call();
-            git.close();
+            this.git.checkout().setName(commitHash).call();
+            this.git.close();
+            return path;
 
         } catch (Exception e) {
             System.out.println("Error cloning repository");
             // print exception code
             System.out.println(e);
-            return false;
+            return null;
         }
-
-        // run tests for specified project after cloning
-        boolean result = runMavenTests(path);
-
-        // Delete the cloned repository efter running tests
-        git.close();
-        git = null;
-        Git.shutdown();
-        removeRecursively(dir);
-
-        // if tests pass, return true. Otherwise, return false.
-        return result;
     }
 
-    /**
+    public void deleteRepo(String path){
+        // Delete the cloned repository efter running tests
+        this.git.close();
+        this.git = null;
+        Git.shutdown();
+        File dir = new File(path);
+        // TODO: Try this while testing dir.mkdirs(); 
+        // Ensure the directory does not exists
+        removeRecursively(dir);
+    }
+
+     /**
      * Recursively remove a file or directory from the given path
      * 
      * @param f (File) The file or directory to remove
@@ -74,18 +74,27 @@ public class Project {
      * 
      * @param path (String) The path to where the repo is cloned
      */
-    private boolean runMavenTests(String path) {
+    public boolean runMavenTests(String path) {
         int exitcode = -1;
+
         try {
             ProcessBuilder builder = new ProcessBuilder("mvn", "package");
             builder.directory(new File(path + "/ciapp"));
             builder.redirectErrorStream(true); // merges stdout and stderr
             Process process = builder.start();
 
+            // Log from process
+            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while((line = in.readLine()) != null){
+                System.out.println(line);
+            }
+
             exitcode = process.waitFor(); // wait for process to finish running tests
+            in.close();
 
         } catch (Exception e) {
-
+            System.out.println("Exception while running tests\n" + e);
         }
         if (exitcode == 0) {
             // DEBUG
@@ -96,4 +105,8 @@ public class Project {
             return false;
         }
     }
+
+    
+
+    
 }
