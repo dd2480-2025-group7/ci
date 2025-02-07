@@ -24,7 +24,7 @@ public class Project {
         System.out.println("Commit: " + commitHash);
 
         // Clone repo inside tmp directory
-        String path = System.getProperty("java.io.tmpdir") + "/ciRepo/" + this.checkId;
+        String path = System.getProperty("java.io.tmpdir") + "/ci-tests/" + this.checkId;
         File dir = new File(path);
         dir.mkdirs(); // Ensure the directory exists
         System.out.println("Cloning repository to: " + path);
