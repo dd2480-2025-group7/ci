@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn -f pom.xml clean package
 #
 # Package stage
 #
-FROM eclipse-temurin:18-jre-jammy
+FROM maven:eclipse-temurin
 ARG JAR_FILE=/usr/app/target/ciapp-1.0-SNAPSHOT.jar
 
 # Copy the built JAR from the build stage
