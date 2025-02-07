@@ -1,18 +1,17 @@
 package com.group7.ciapp;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.http.ContentType;
 import org.json.JSONObject;
 
 /**
@@ -25,9 +24,9 @@ public class StoreBuildResult {
     /**
      * Get github token from environment variable.
      */
-    public StoreBuildResult() {
+    public StoreBuildResult(String jwt) {
         // Get the environment variable
-        this.github_token = System.getenv("GITHUB_ACCESS_TOKEN");
+        this.github_token = jwt;
 
         // Check if the variable is set
         if (this.github_token == null) {
@@ -46,7 +45,7 @@ public class StoreBuildResult {
      * @throws ParseException
      * @throws org.apache.hc.core5.http.ParseException
      */
-    public int setStatusBuilding(String commitHash, String owner, String repo)
+    public Long setStatusBuilding(String commitHash, String owner, String repo)
             throws IOException, ParseException, org.apache.hc.core5.http.ParseException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost request = new HttpPost(String.format("https://api.github.com/repos/%s/%s/check-runs", owner, repo));
@@ -69,7 +68,7 @@ public class StoreBuildResult {
         // Get JSON response as org.JSON.JSONObject
         String responseString = EntityUtils.toString(response.getEntity());
         JSONObject jsonResponse = new org.json.JSONObject(responseString);
-        int checkID = jsonResponse.getInt("id");
+        Long checkID = jsonResponse.getLong("id");
         return checkID;
     }
 
@@ -84,8 +83,8 @@ public class StoreBuildResult {
      * @param isSuccess  (boolean) Says whether the tests passsed or not.
      * @throws IOException if an error occurs while sending the request.
      */
-    public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, int checkID)
-            throws IOException {
+    public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, Long checkID)
+            throws IOException, org.apache.hc.core5.http.ParseException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPatch request = new HttpPatch(
                 String.format("https://api.github.com/repos/%s/%s/check-runs/%d", owner, repo, checkID));
@@ -94,16 +93,17 @@ public class StoreBuildResult {
         request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         String jsonBody = "{"
                 + "\"status\": \"completed\","
-                + "\"conclusion\": \"" + isSuccess + "\","
+                + "\"conclusion\": \"" + ((isSuccess) ? "success" : "failure") + "\","
                 + "\"output\": {"
-                + "   \"title\": \"Build Passed\","
+                + "   \"title\": \"Build " + ((isSuccess) ? "success" : "failure") + "\","
                 + "   \"summary\": \"The build and tests passed successfully.\""
                 + "}"
                 + "}";
         request.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
         CloseableHttpResponse response = client.execute(request);
 
-        // print response data in JSON
-        System.out.println(response);
+        // Get JSON response as org.JSON.JSONObject
+        String responseString = EntityUtils.toString(response.getEntity());
+        JSONObject jsonResponse = new org.json.JSONObject(responseString);
     }
 }
