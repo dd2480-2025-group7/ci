@@ -97,11 +97,11 @@ public class WebServer extends AbstractHandler {
                 // create new store build result object
                 StoreBuildResult sbr = new StoreBuildResult();
 
-                int check_id = 0;
+                int checkId = 0;
 
                 // set status to building on GitHub
                 try {
-                    check_id = sbr.setStatusBuilding(commitHash, owner, repo);
+                    checkId = sbr.setStatusBuilding(commitHash, owner, repo);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (java.text.ParseException e) {
@@ -111,14 +111,14 @@ public class WebServer extends AbstractHandler {
                 }
 
                 // create new project object with git URL and commit hash
-                Project project = new Project(gitUrl, commitHash);
+                Project project = new Project(gitUrl, commitHash, checkId);
 
                 // run tests and get result
                 Boolean isSuccess = project.start();
 
                 // set status to complete on GitHub
                 try {
-                    sbr.setStatusComplete(commitHash, owner, repo, isSuccess, check_id);
+                    sbr.setStatusComplete(commitHash, owner, repo, isSuccess, checkId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
