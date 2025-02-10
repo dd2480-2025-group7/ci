@@ -16,6 +16,7 @@ public class Project {
     private Git git;
     private Long checkId;
     private String path;
+    private ProcessExecutor processExecutor;
 
     /**
      * Sets the URL, commit hash and check-ID of the repository.
@@ -29,6 +30,23 @@ public class Project {
         this.commitHash = commitHash;
         this.checkId = checkId;
         this.path = System.getProperty("java.io.tmpdir") + "/ci-tests/";
+        this.processExecutor = new MavenProcessExecutor();
+    }
+
+    /**
+     * Overloaded constructor for testing purposes.
+     *
+     * @param url        (String) The URL to the repository.
+     * @param commitHash (String) The commit hash to checkout.
+     * @param checkId    (Long) The GitHub check ID.
+     * @param executor   (ProcessExecutor) The process executor to use.
+     */
+    public Project(String url, String commitHash, Long checkId, ProcessExecutor executor) {
+        this.url = url;
+        this.commitHash = commitHash;
+        this.checkId = checkId;
+        this.path = System.getProperty("java.io.tmpdir") + "/ci-tests/";
+        this.processExecutor = executor;
     }
 
     /**
@@ -94,10 +112,8 @@ public class Project {
         int exitcode = -1;
 
         try {
-            ProcessBuilder builder = new ProcessBuilder("mvn", "package");
-            builder.directory(new File(path + "/ciapp"));
-            builder.redirectErrorStream(true); // merges stdout and stderr
-            Process process = builder.start();
+            File directory = new File(path + "/ciapp");
+            Process process = processExecutor.startProcess(directory);
 
             // Log from process
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));

@@ -140,11 +140,11 @@ public class TokenGetter {
     /**
      * Get Private Key from String.
      * 
-     * @param Key (String) Private Key in String format.
+     * @param key (String) Private Key in String format.
      * @return (RSAPrivateKeyv) Private Key
      * @throws Exception if an error occurs while getting the private key.
      */
-    private static RSAPrivateKey getPrivateKey(String key)
+    public static RSAPrivateKey getPrivateKey(String key)
             throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
