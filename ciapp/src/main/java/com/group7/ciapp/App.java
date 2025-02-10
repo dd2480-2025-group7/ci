@@ -11,10 +11,17 @@ import org.eclipse.jetty.util.log.StdErrLog;
 public class App {
 
     /**
+     * Default constructor for App.
+     */
+    public App() {
+        // Default constructor
+    }
+
+    /**
      * Starts the server and listens for incoming requests.
      * 
-     * @param args
-     * @throws Exception
+     * @param args (String[]) Command line arguments.
+     * @throws Exception if an error occurs while starting the server.
      */
     public static void main(String[] args) throws Exception {
         // check that required environment variables are set
@@ -25,13 +32,18 @@ public class App {
             System.exit(1);
         }
 
-        System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
-        Log.setLog(new StdErrLog());
-        Log.getRootLogger().setDebugEnabled(true);
+        try {
+            System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
+            Log.setLog(new StdErrLog());
+            Log.getRootLogger().setDebugEnabled(true);
 
-        Server server = new Server(8080);
-        server.setHandler(new WebServer());
-        server.start();
-        server.join();
+            Server server = new Server(8080);
+            server.setHandler(new WebServer());
+            server.start();
+            server.join();
+        } catch (Exception e) {
+            System.out.println("Exception if an error occurs while starting the server.");
+            e.printStackTrace();
+        }
     }
 }

@@ -30,7 +30,7 @@ public class ProjectTest {
      * and the path should exist.
      */
     @Test
-    void testCloneRepo_true() {
+    void testCloneRepo_true() throws Exception {
         String path = project.cloneRepo();
         File dir = new File(path);
         boolean pathExists = dir.exists();
@@ -44,7 +44,7 @@ public class ProjectTest {
      * should not be null since it is a valid path. Path2 should not exist.
      */
     @Test
-    void testCloneRepo_false() {
+    void testCloneRepo_false() throws Exception {
         String path = project.cloneRepo();
         String path2 = path.substring(0, path.length() - 1);
         path2 = path2 + "2";
@@ -57,17 +57,15 @@ public class ProjectTest {
     }
 
     /**
-     * Tries to clone repo twice, should be catched as an error and return null
+     * Tries to clone repo twice, should be catched as an exception
      * since previous repo was not deleted.
      */
     @Test
-    void testCloneRepo_duplicate() {
+    void testCloneRepo_duplicate() throws Exception {
         String path = project.cloneRepo();
-        String path2 = project.cloneRepo();
+        assertThrows(Exception.class, () -> project.cloneRepo());
 
         project.deleteRepo(path); // delete repo so we don't have to do it manually
-        assertNotNull(path);
-        assertNull(path2);
     }
 
     /**
@@ -75,7 +73,7 @@ public class ProjectTest {
      * deletion.
      */
     @Test
-    void testDeleteRepo_true() {
+    void testDeleteRepo_true() throws Exception {
         String path = project.cloneRepo();
         File dir = new File(path);
         project.deleteRepo(path); // delete repo so we don't have to do it manually
@@ -87,16 +85,15 @@ public class ProjectTest {
      * Checks if deletion was unsuccesful when wrong input path was given
      */
     @Test
-    void testDeleteRepo_false() {
+    void testDeleteRepo_false() throws Exception {
         // Clone the repo
         String path = project.cloneRepo();
 
         // Create another path variable that does not have an actual repo
-        String path2 = path.substring(0, path.length() - 1);
-        path2 += "2";
+        String path2 = path.substring(0, path.length() - 1) + "2";
 
         // Delete the non-existing repo
-        project.deleteRepo(path2);
+        assertThrows(Exception.class, () -> project.deleteRepo(path2));
 
         // Check if the original repo still exists (which it should)
         File dir = new File(path);
