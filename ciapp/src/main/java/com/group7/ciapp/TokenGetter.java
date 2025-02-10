@@ -104,7 +104,7 @@ public class TokenGetter {
         return jsonResponse.getString("token");
     }
 
-    private static RSAPrivateKey getPrivateKey(String key) throws Exception {
+    public static RSAPrivateKey getPrivateKey(String key) throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
