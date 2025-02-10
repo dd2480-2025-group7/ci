@@ -1,5 +1,8 @@
 package com.group7.ciapp;
 
+/**
+ * This class represents a build.
+ */
 public class Build {
     private Long id;
     private String commitHash;
@@ -9,10 +12,10 @@ public class Build {
     /**
      * Constructor for Build
      * 
-     * @param id
-     * @param commitHash
-     * @param buildDate
-     * @param buildLog
+     * @param id         the ID of the build
+     * @param commitHash the commit hash of the build
+     * @param buildDate  the build date of the build
+     * @param buildLog   the build log of the build
      */
     public Build(Long id, String commitHash, String buildDate, String buildLog) {
         this.id = id;
@@ -33,7 +36,7 @@ public class Build {
     /**
      * Get the commit hash of the build
      * 
-     * @return
+     * @return (String) The commit hash of the build
      */
     public String getCommitHash() {
         return commitHash;
@@ -42,7 +45,7 @@ public class Build {
     /**
      * Get the build date of the build
      * 
-     * @return
+     * @return (String) The build date of the build
      */
     public String getBuildDate() {
         return buildDate;
@@ -51,7 +54,7 @@ public class Build {
     /**
      * Get the build log of the build
      * 
-     * @return
+     * @return (String) The build log of the build
      */
     public String getBuildLog() {
         return buildLog;
