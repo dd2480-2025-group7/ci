@@ -34,6 +34,12 @@ public class WebServerTest {
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
     }
 
+    /**
+     * Test that the server responds with a 200 OK status code and the correct
+     * message when the root path is requested.
+     *
+     * @throws Exception
+     */
     @Test
     public void testHandleIndex() throws Exception {
         when(request.getMethod()).thenReturn("GET");
@@ -46,6 +52,12 @@ public class WebServerTest {
                 "Expected response to contain 'CI Server is up and running' but got: " + responseWriter.toString());
     }
 
+    /**
+     * Test that the server responds with a 202 accepted status code and the correct
+     * message when a push event is received.
+     *
+     * @throws Exception
+     */
     @Test
     public void testHandleWebhookPush() throws Exception {
         when(request.getMethod()).thenReturn("POST");
@@ -67,6 +79,12 @@ public class WebServerTest {
         verify(response).setStatus(HttpServletResponse.SC_ACCEPTED);
     }
 
+    /**
+     * Test that the server responds with a 400 bad request status code and the
+     * correct message when an invalid event type is received.
+     *
+     * @throws Exception
+     */
     @Test
     public void testHandleWebhookWithInvalidEvent() throws Exception {
         when(request.getMethod()).thenReturn("POST");
@@ -81,6 +99,12 @@ public class WebServerTest {
                         + responseWriter.toString());
     }
 
+    /**
+     * Test that the server responds with a 400 bad request status code and the
+     * correct message when an unsupported repository is received.
+     *
+     * @throws Exception
+     */
     @Test
     public void testHandleWebhookWithUnsupportedRepository() throws Exception {
         when(request.getMethod()).thenReturn("POST");
@@ -103,6 +127,12 @@ public class WebServerTest {
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 
+    /**
+     * Test that the server responds with a 404 not found status code and the
+     * correct message when an invalid path is requested.
+     *
+     * @throws Exception
+     */
     @Test
     public void testHandleNotFound() throws Exception {
         when(request.getMethod()).thenReturn("GET");
