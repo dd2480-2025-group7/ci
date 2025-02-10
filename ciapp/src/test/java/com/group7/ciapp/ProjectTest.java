@@ -35,10 +35,7 @@ public class ProjectTest {
 
     /**
      * Clone the repo and compare it with an non-existing path. The original path
-     * 
-     * 
-     * should not be
-     * null since it is a valid path. Path2 should not exist.
+     * should not be null since it is a valid path. Path2 should not exist.
      */
     @Test
     void testCloneRepo_false() {
