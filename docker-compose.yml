@@ -10,6 +10,8 @@ services:
     volumes:
       - .:/usr/app
       - ./private-key.pem:/usr/app/private-key.pem
+      - ./database.db:/usr/app/database.db
     environment:
       - PRIVATE_KEY_PATH=/usr/app/private-key.pem
+      - DATABASE_PATH=/usr/app/database.db
       - APP_ID=${APP_ID} # read from .env file
