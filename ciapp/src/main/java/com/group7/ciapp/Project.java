@@ -45,9 +45,7 @@ public class Project {
             this.git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
             // checkout specific commit
             this.git.checkout().setName(commitHash).call();
-            this.git.close();
             return path;
-
         } catch (Exception e) {
             System.out.println("Error cloning repository");
             // print exception code
@@ -62,10 +60,12 @@ public class Project {
      * @param path (String) The path to the cloned repository.
      */
     public void deleteRepo(String path) {
-        // Delete the cloned repository efter running tests
-        this.git.close();
-        this.git = null;
-        Git.shutdown();
+        // Delete the cloned repository after running tests
+        if (this.git != null) {
+            this.git.close();
+            this.git = null;
+        }
+
         File dir = new File(path);
         // TODO: Try this while testing dir.mkdirs();
         // Ensure the directory does not exists
