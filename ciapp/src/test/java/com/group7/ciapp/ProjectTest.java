@@ -131,7 +131,7 @@ public class ProjectTest {
     }
 
     /**
-     * Test if the runMavenTests return true when the tests pass.
+     * Test if the runMavenTests return false when the tests fails.
      * 
      * @throws Exception
      */
