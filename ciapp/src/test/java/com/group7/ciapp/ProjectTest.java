@@ -110,7 +110,7 @@ public class ProjectTest {
         project.deleteRepo(path);
     }
 
-     /**
+    /**
      * Test if the runMavenTests return true when the tests pass.
      * 
      * @throws Exception
