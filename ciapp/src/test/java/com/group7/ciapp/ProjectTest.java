@@ -25,7 +25,7 @@ public class ProjectTest {
     void testCloneRepo_true() {
         String path = project.cloneRepo();
 
-        boolean pathExists = path.contains("ci-tests/" + testCheckId);
+        boolean pathExists = path.contains("/ci-tests/" + testCheckId);
         project.deleteRepo(path); // delete repo so we don't have to do it manually
         assertNotNull(path);
         assertTrue(pathExists);
@@ -39,7 +39,7 @@ public class ProjectTest {
     void testCloneRepo_false() {
         String path = project.cloneRepo();
 
-        boolean pathEquality = path.contains("ci-tests/" + 2);
+        boolean pathEquality = path.contains("/ci-tests/" + 2);
         project.deleteRepo(path); // delete repo so we don't have to do it manually
         assertNotNull(path);
         assertFalse(pathEquality);

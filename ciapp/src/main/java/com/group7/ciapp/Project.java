@@ -28,7 +28,7 @@ public class Project {
         this.url = url;
         this.commitHash = commitHash;
         this.checkId = checkId;
-        this.path = System.getProperty("java.io.tmpdir") + "ci-tests/";
+        this.path = System.getProperty("java.io.tmpdir") + "/ci-tests/";
     }
 
     /**
