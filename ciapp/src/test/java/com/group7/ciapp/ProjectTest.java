@@ -1,7 +1,11 @@
 package com.group7.ciapp;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -13,10 +17,12 @@ public class ProjectTest {
     private static final String testUrl = "https://github.com/dd2480-2025-group7/ci";
     private static final String testCommitHash = "f8fffc3f13557144a1c2563f7628139031dbe7b1";
     private static final Long testCheckId = 1L;
+    private static ProcessExecutor mockExecutor;
 
     @BeforeAll
     static void setUp() {
-        project = new Project(testUrl, testCommitHash, testCheckId);
+        mockExecutor = mock(ProcessExecutor.class);
+        project = new Project(testUrl, testCommitHash, testCheckId, mockExecutor);
     }
 
     /**
@@ -98,6 +104,52 @@ public class ProjectTest {
         assertTrue(pathExists);
 
         // Delete the existing repo so we don't have to do it manually
+        project.deleteRepo(path);
+    }
+
+    /**
+     * Test if the runMavenTests return true when the tests pass.
+     * 
+     * @throws Exception
+     */
+    @Test
+    void runMavenTestsSuccess() throws Exception {
+        // clone repo
+        String path = project.cloneRepo();
+
+        // mock process
+        Process mockProcess = mock(Process.class);
+        when(mockProcess.getInputStream()).thenReturn(new ByteArrayInputStream("Build Success".getBytes()));
+        when(mockProcess.waitFor()).thenReturn(0);
+        when(mockExecutor.startProcess(any(File.class))).thenReturn(mockProcess);
+
+        boolean result = project.runMavenTests(path);
+        assertTrue(result, "Maven tests should pass (exit code 0)");
+
+        // delete repo
+        project.deleteRepo(path);
+    }
+
+    /**
+     * Test if the runMavenTests return false when the tests fails.
+     * 
+     * @throws Exception
+     */
+    @Test
+    void runMavenTestsFailure() throws Exception {
+        // clone repo
+        String path = project.cloneRepo();
+
+        // mock process
+        Process mockProcess = mock(Process.class);
+        when(mockProcess.getInputStream()).thenReturn(new ByteArrayInputStream("Build Not success".getBytes()));
+        when(mockProcess.waitFor()).thenReturn(1);
+        when(mockExecutor.startProcess(any(File.class))).thenReturn(mockProcess);
+
+        boolean result = project.runMavenTests(path);
+        assertFalse(result, "Maven tests should fail (exit code != 0)");
+
+        // delete repo
         project.deleteRepo(path);
     }
 }
