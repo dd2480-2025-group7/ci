@@ -59,7 +59,7 @@ public class TokenGetter {
         }
     }
 
-    private static Integer getInstallationId(String jwt) throws Exception {
+    public static Integer getInstallationId(String jwt) throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet request = new HttpGet(String.format("https://api.github.com/app/installations"));
         request.setHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
@@ -86,7 +86,7 @@ public class TokenGetter {
         return null;
     }
 
-    private static String getInstallationAccessToken(Integer installation_id, String jwt) throws Exception {
+    public static String getInstallationAccessToken(Integer installation_id, String jwt) throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost request = new HttpPost(String
                 .format("https://api.github.com/app/installations/%d/access_tokens", installation_id));
@@ -104,7 +104,7 @@ public class TokenGetter {
         return jsonResponse.getString("token");
     }
 
-    private static RSAPrivateKey getPrivateKey(String key) throws Exception {
+    public static RSAPrivateKey getPrivateKey(String key) throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
