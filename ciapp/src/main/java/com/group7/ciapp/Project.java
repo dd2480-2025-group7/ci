@@ -63,14 +63,13 @@ public class Project {
      */
     public void deleteRepo(String path) {
         // Delete the cloned repository after running tests
+        // TODO: Throw exception if path is empty/does not exist
         if (this.git != null) {
             this.git.close();
             this.git = null;
         }
 
         File dir = new File(path);
-        // TODO: Try this while testing dir.mkdirs();
-        // Ensure the directory does not exists
         removeRecursively(dir);
     }
 
