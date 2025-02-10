@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jgit.api.Git;
 import org.json.JSONObject;
 
 /**
@@ -20,9 +21,17 @@ public class WebServer extends AbstractHandler {
     private static ConfigReader configReader;
 
     /**
-     * Set configReader if null
+     * Add a shutdown hook to handle cleanup when server is stopped
+     * Set configReader if null, and load repositories
      */
     public WebServer() {
+        // add shutdown hook to handle cleanup when server is stopped
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutdown hook running...");
+            Git.shutdown();
+            System.out.println("JGit Shutdown complete");
+        }));
+
         if (configReader == null) {
             configReader = new ConfigReader();
             configReader.loadRepositories();
