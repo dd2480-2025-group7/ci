@@ -15,6 +15,7 @@ public class Project {
     private String commitHash;
     private Git git;
     private Long checkId;
+    private String path;
 
     /**
      * Sets the URL, commit hash and check-ID of the repository.
@@ -27,6 +28,7 @@ public class Project {
         this.url = url;
         this.commitHash = commitHash;
         this.checkId = checkId;
+        this.path = System.getProperty("java.io.tmpdir") + "/ci-tests/";
     }
 
     /**
@@ -38,7 +40,7 @@ public class Project {
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commitHash);
         // Clone repo inside tmp directory
-        String path = System.getProperty("java.io.tmpdir") + "/ci-tests/" + this.checkId;
+        String path = this.path + this.checkId;
         System.out.println("Cloning repository to: " + path);
 
         try {
