@@ -44,15 +44,13 @@ public class ProjectTest {
 
     /**
      * Clone the repo and compare it with an non-existing path. The original path
-     * should not be
-     * null since it is a valid path. Path2 should not exist.
+     * should not be null since it is a valid path. Path2 should not exist.
      */
     @Test
     void testCloneRepo_false() {
-        Project project2 = new Project(ProjectTest.testUrl, ProjectTest.testCommitHash, 2L);
-        String path = project2.cloneRepo();
+        String path = project.cloneRepo();
         String path2 = path.substring(0, path.length() - 1);
-        path2 = path2 + "1";
+        path2 = path2 + "2";
 
         File dir = new File(path2);
         boolean pathExists = dir.exists();
@@ -76,6 +74,43 @@ public class ProjectTest {
     }
 
     /**
+     * Checks that repository deletion works. The directory should not exist after
+     * deletion.
+     */
+    @Test
+    void testDeleteRepo_true() {
+        String path = project.cloneRepo();
+        File dir = new File(path);
+        project.deleteRepo(path); // delete repo so we don't have to do it manually
+        boolean pathDoesNotExists = !dir.exists();
+        assertTrue(pathDoesNotExists);
+    }
+
+    /**
+     * Checks if deletion was unsuccesful when wrong input path was given
+     */
+    @Test
+    void testDeleteRepo_false() {
+        // Clone the repo
+        String path = project.cloneRepo();
+
+        // Create another path variable that does not have an actual repo
+        String path2 = path.substring(0, path.length() - 1);
+        path2 += "2";
+
+        // Delete the non-existing repo
+        project.deleteRepo(path2);
+
+        // Check if the original repo still exists (which it should)
+        File dir = new File(path);
+        boolean pathExists = dir.exists();
+        assertTrue(pathExists);
+
+        // Delete the existing repo so we don't have to do it manually
+        project.deleteRepo(path);
+    }
+
+     /**
      * Test if the runMavenTests return true when the tests pass.
      * 
      * @throws Exception
