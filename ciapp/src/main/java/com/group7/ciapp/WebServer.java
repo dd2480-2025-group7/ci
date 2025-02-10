@@ -137,11 +137,6 @@ public class WebServer extends AbstractHandler {
      * @param owner      (String) The owner of the repo.
      * @param repo       (String) The GitHub repo that is being used.
      * @param gitUrl     (String) The URL of the repository.
-     * @throws IOException                             If an input or output
-     *                                                 exception occurs.
-     * @throws java.text.ParseException                If a parse exception occurs.
-     * @throws org.apache.hc.core5.http.ParseException If a parse exception occurs.
-     * @throws Exception                               If an exception occurs.
      */
     private void newThread(String commitHash, String owner, String repo, String gitUrl) {
         String jwt;
@@ -161,11 +156,7 @@ public class WebServer extends AbstractHandler {
         try {
             // set status to building on GitHub
             checkId = sbr.setStatusBuilding(commitHash, owner, repo);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (java.text.ParseException e) {
-            e.printStackTrace();
-        } catch (org.apache.hc.core5.http.ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -180,10 +171,6 @@ public class WebServer extends AbstractHandler {
 
             // set status to complete on GitHub
             sbr.setStatusComplete(commitHash, owner, repo, isSuccess, checkId);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (org.apache.hc.core5.http.ParseException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

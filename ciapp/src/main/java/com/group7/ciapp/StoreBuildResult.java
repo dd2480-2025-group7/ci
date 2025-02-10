@@ -1,8 +1,5 @@
 package com.group7.ciapp;
 
-import java.io.IOException;
-import java.text.ParseException;
-
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -25,14 +22,15 @@ public class StoreBuildResult {
      * Get github token from environment variable.
      * 
      * @param jwt (String) The GitHub token.
+     * @throws Exception if the GitHub token is not found.
      */
-    public StoreBuildResult(String jwt) {
+    public StoreBuildResult(String jwt) throws Exception {
         // Get the environment variable
         this.github_token = jwt;
 
         // Check if the variable is set
         if (this.github_token == null) {
-            // TODO: quit the program and throw an exception
+            throw new Exception("No GitHub token found.");
         }
     }
 
@@ -43,14 +41,10 @@ public class StoreBuildResult {
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
      * @return (int) The check ID of the check run.
-     * @throws IOException                             if IOException occurs.
-     * @throws ParseException                          if an error occurs while
-     *                                                 parsing the response.
-     * @throws org.apache.hc.core5.http.ParseException if an error occurs while
-     *                                                 parsing the response.
+     * @throws Exception if an error occurs while sending the request.
      */
     public Long setStatusBuilding(String commitHash, String owner, String repo)
-            throws IOException, ParseException, org.apache.hc.core5.http.ParseException {
+            throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost request = new HttpPost(String.format("https://api.github.com/repos/%s/%s/check-runs", owner, repo));
         request.setHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
@@ -86,12 +80,10 @@ public class StoreBuildResult {
      * @param repo       (boolean) The GitHub repo that is being used.
      * @param isSuccess  (boolean) Says whether the tests passsed or not.
      * @param checkID    (Long) The check ID of the check run.
-     * @throws IOException                             if an input or output
-     *                                                 exception occurs.
-     * @throws org.apache.hc.core5.http.ParseException if a parse exception occurs.
+     * @throws Exception if an error occurs while sending the request.
      */
     public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, Long checkID)
-            throws IOException, org.apache.hc.core5.http.ParseException {
+            throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPatch request = new HttpPatch(
                 String.format("https://api.github.com/repos/%s/%s/check-runs/%d", owner, repo, checkID));

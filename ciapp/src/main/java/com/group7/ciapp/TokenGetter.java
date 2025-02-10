@@ -3,9 +3,7 @@ package com.group7.ciapp;
 import java.io.File;
 import java.nio.file.Files;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
@@ -144,12 +142,10 @@ public class TokenGetter {
      * 
      * @param Key (String) Private Key in String format.
      * @return (RSAPrivateKeyv) Private Key
-     * @throws NoSuchAlgorithmException if the algorithm is not found.
-     * @throws NullPointerException     if the key is null.
-     * @throws InvalidKeySpecException  if the key is invalid.
+     * @throws Exception if an error occurs while getting the private key.
      */
     private static RSAPrivateKey getPrivateKey(String key)
-            throws NoSuchAlgorithmException, NullPointerException, InvalidKeySpecException {
+            throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");

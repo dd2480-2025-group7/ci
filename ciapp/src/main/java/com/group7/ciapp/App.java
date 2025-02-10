@@ -35,7 +35,8 @@ public class App {
             server.start();
             server.join();
         } catch (Exception e) {
-            throw new Exception("Exception if an error occurs while starting the server.\n" + e);
+            System.out.println("Exception if an error occurs while starting the server.");
+            e.printStackTrace();
         }
 
     }

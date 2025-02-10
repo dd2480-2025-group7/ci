@@ -1,11 +1,9 @@
 package com.group7.ciapp;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -37,12 +35,9 @@ public class Project {
      * Clone the repository from the given URL and checkout the given commit hash.
      * 
      * @return (String) The path to the cloned repository. Null if an error occurs.
-     * @throws IllegalStateException if the repository is invalid.
-     * @throws GitAPIException       if an error occurs while cloning the
-     *                               repository.
-     * @throws NullPointerException  if the URL or commit hash is null.
+     * @throws Exception if an error occurs while cloning the repository.
      */
-    public String cloneRepo() throws IllegalStateException, GitAPIException, NullPointerException {
+    public String cloneRepo() throws Exception {
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commitHash);
         // Clone repo inside tmp directory
@@ -93,10 +88,9 @@ public class Project {
      * 
      * @param path (String) The path to the cloned repository.
      * @return (boolean) True if all tests pass, false otherwise.
-     * @throws IOException          if an I/O error occurs.
-     * @throws InterruptedException if the process is interrupted.
+     * @throws Exception if an error occurs while running the tests.
      */
-    public boolean runMavenTests(String path) throws IOException, InterruptedException {
+    public boolean runMavenTests(String path) throws Exception {
         int exitcode = -1;
 
         try {
