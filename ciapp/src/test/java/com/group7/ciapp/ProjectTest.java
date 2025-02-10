@@ -39,10 +39,9 @@ public class ProjectTest {
      */
     @Test
     void testCloneRepo_false() {
-        Project project2 = new Project(ProjectTest.testUrl, ProjectTest.testCommitHash, 2L);
-        String path = project2.cloneRepo();
+        String path = project.cloneRepo();
         String path2 = path.substring(0, path.length() - 1);
-        path2 = path2 + "1";
+        path2 = path2 + "2";
 
         File dir = new File(path2);
         boolean pathExists = dir.exists();
