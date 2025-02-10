@@ -2,6 +2,8 @@ package com.group7.ciapp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -24,25 +26,29 @@ public class ProjectTest {
     @Test
     void testCloneRepo_true() {
         String path = project.cloneRepo();
-
-        boolean pathExists = path.contains("/ci-tests/" + testCheckId);
+        File dir = new File(path);
+        boolean pathExists = dir.exists();
         project.deleteRepo(path); // delete repo so we don't have to do it manually
         assertNotNull(path);
         assertTrue(pathExists);
     }
 
     /**
-     * Clone the repo and compare it with an incorrect path. The path should not be
-     * null since it is a valid path.
+     * Clone the repo and compare it with an non-existing path. The original path should not be
+     * null since it is a valid path. Path2 should not exist.
      */
     @Test
     void testCloneRepo_false() {
-        String path = project.cloneRepo();
+        Project project2 = new Project(ProjectTest.testUrl, ProjectTest.testCommitHash, 2L);
+        String path = project2.cloneRepo();
+        String path2 = path.substring(0, path.length() - 1);
+        path2 = path2 + "1";
 
-        boolean pathEquality = path.contains("/ci-tests/" + 2);
+        File dir = new File(path2);
+        boolean pathExists = dir.exists();
         project.deleteRepo(path); // delete repo so we don't have to do it manually
         assertNotNull(path);
-        assertFalse(pathEquality);
+        assertFalse(pathExists);
     }
 
     /**
@@ -57,6 +63,5 @@ public class ProjectTest {
         project.deleteRepo(path); // delete repo so we don't have to do it manually
         assertNotNull(path);
         assertNull(path2);
-
     }
 }
