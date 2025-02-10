@@ -23,6 +23,8 @@ public class StoreBuildResult {
 
     /**
      * Get github token from environment variable.
+     * 
+     * @param jwt (String) The GitHub token.
      */
     public StoreBuildResult(String jwt) {
         // Get the environment variable
@@ -41,9 +43,11 @@ public class StoreBuildResult {
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
      * @return (int) The check ID of the check run.
-     * @throws IOException
-     * @throws ParseException
-     * @throws org.apache.hc.core5.http.ParseException
+     * @throws IOException                             if IOException occurs.
+     * @throws ParseException                          if an error occurs while
+     *                                                 parsing the response.
+     * @throws org.apache.hc.core5.http.ParseException if an error occurs while
+     *                                                 parsing the response.
      */
     public Long setStatusBuilding(String commitHash, String owner, String repo)
             throws IOException, ParseException, org.apache.hc.core5.http.ParseException {
@@ -81,7 +85,10 @@ public class StoreBuildResult {
      * @param owner      (String) The owner of the repo.
      * @param repo       (boolean) The GitHub repo that is being used.
      * @param isSuccess  (boolean) Says whether the tests passsed or not.
-     * @throws IOException if an error occurs while sending the request.
+     * @param checkID    (Long) The check ID of the check run.
+     * @throws IOException                             if an input or output
+     *                                                 exception occurs.
+     * @throws org.apache.hc.core5.http.ParseException if a parse exception occurs.
      */
     public void setStatusComplete(String commitHash, String owner, String repo, boolean isSuccess, Long checkID)
             throws IOException, org.apache.hc.core5.http.ParseException {

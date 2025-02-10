@@ -9,10 +9,17 @@ import org.eclipse.jetty.server.Server;
 public class App {
 
     /**
+     * Default constructor for App.
+     */
+    public App() {
+        // Default constructor
+    }
+
+    /**
      * Starts the server and listens for incoming requests.
      * 
-     * @param args
-     * @throws Exception
+     * @param args (String[]) Command line arguments.
+     * @throws Exception if an error occurs while starting the server.
      */
     public static void main(String[] args) throws Exception {
         // check that required environment variables are set
@@ -22,9 +29,14 @@ public class App {
             System.exit(1);
         }
 
-        Server server = new Server(8080);
-        server.setHandler(new WebServer());
-        server.start();
-        server.join();
+        try {
+            Server server = new Server(8080);
+            server.setHandler(new WebServer());
+            server.start();
+            server.join();
+        } catch (Exception e) {
+            throw new Exception("Exception if an error occurs while starting the server.\n" + e);
+        }
+
     }
 }

@@ -1,9 +1,11 @@
 package com.group7.ciapp;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -35,42 +37,41 @@ public class Project {
      * Clone the repository from the given URL and checkout the given commit hash.
      * 
      * @return (String) The path to the cloned repository. Null if an error occurs.
+     * @throws IllegalStateException if the repository is invalid.
+     * @throws GitAPIException       if an error occurs while cloning the
+     *                               repository.
+     * @throws NullPointerException  if the URL or commit hash is null.
      */
-    public String cloneRepo() {
+    public String cloneRepo() throws IllegalStateException, GitAPIException, NullPointerException {
         System.out.println("Repo URL: " + url);
         System.out.println("Commit: " + commitHash);
         // Clone repo inside tmp directory
         String path = this.path + this.checkId;
         System.out.println("Cloning repository to: " + path);
 
-        try {
-            this.git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
-            // checkout specific commit
-            this.git.checkout().setName(commitHash).call();
-            return path;
-        } catch (Exception e) {
-            System.out.println("Error cloning repository");
-            // print exception code
-            System.out.println(e);
-            return null;
-        }
+        this.git = Git.cloneRepository().setURI(url).setDirectory(new File(path)).call();
+        // checkout specific commit
+        this.git.checkout().setName(commitHash).call();
+        return path;
     }
 
     /**
      * Delete the cloned repository.
      * 
      * @param path (String) The path to the cloned repository.
+     * @throws Exception if the given path does not exist.
      */
-    public void deleteRepo(String path) {
-        // Delete the cloned repository after running tests
-        // TODO: Throw exception if path is empty/does not exist
+    public void deleteRepo(String path) throws Exception {
         if (this.git != null) {
             this.git.close();
             this.git = null;
         }
-
         File dir = new File(path);
-        removeRecursively(dir);
+        if (dir.exists()) {
+            removeRecursively(dir);
+        } else {
+            throw new Exception("Error deleting repo: path does not exist");
+        }
     }
 
     /**
@@ -91,8 +92,11 @@ public class Project {
      * Run Maven tests. If all tests pass, return true, else, return false.
      * 
      * @param path (String) The path to the cloned repository.
+     * @return (boolean) True if all tests pass, false otherwise.
+     * @throws IOException          if an I/O error occurs.
+     * @throws InterruptedException if the process is interrupted.
      */
-    public boolean runMavenTests(String path) {
+    public boolean runMavenTests(String path) throws IOException, InterruptedException {
         int exitcode = -1;
 
         try {
