@@ -31,8 +31,6 @@ public class Database {
 
     /**
      * Create the build table if it does not exist
-     * 
-     * @return void function
      */
     public void createTable() {
         String sql = "CREATE TABLE IF NOT EXISTS build ("
@@ -73,7 +71,7 @@ public class Database {
     /**
      * Get all builds from the build table
      * 
-     * @return ArrayList<Build> a list of all builds
+     * @return ArrayList a list of all builds
      */
     public static ArrayList<Build> getBuilds() {
         String sql = "SELECT * FROM build";
