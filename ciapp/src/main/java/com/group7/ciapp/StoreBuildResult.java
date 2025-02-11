@@ -96,7 +96,7 @@ public class StoreBuildResult {
                 + "\"conclusion\": \"" + ((isSuccess) ? "success" : "failure") + "\","
                 + "\"output\": {"
                 + "   \"title\": \"Build " + ((isSuccess) ? "success" : "failure") + "\","
-                + "   \"summary\": \"The build and tests passed successfully.\""
+                + "   \"summary\": \"The build and tests " + ((isSuccess) ? "passed sucessfully." : "failed, see logs for further details.") + "\""
                 + "}"
                 + "}";
         request.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
