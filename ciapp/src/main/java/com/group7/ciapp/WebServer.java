@@ -1,6 +1,11 @@
 package com.group7.ciapp;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +16,10 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jgit.api.Git;
 import org.json.JSONObject;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+
 /**
  * This class is responsible for handling incoming HTTP requests.
  * It is used to handle the webhook from GitHub and start the CI process.
@@ -18,6 +27,7 @@ import org.json.JSONObject;
  */
 public class WebServer extends AbstractHandler {
     private static ConfigReader configReader;
+    private static Database database;
 
     /**
      * Add a shutdown hook to handle cleanup when server is stopped
@@ -35,6 +45,30 @@ public class WebServer extends AbstractHandler {
             configReader = new ConfigReader();
             configReader.loadRepositories();
         }
+
+        if (database == null) {
+            database = new Database(System.getenv("DATABASE_PATH"));
+            database.createTable();
+        }
+    }
+
+    public void renderTemplate(HttpServletResponse response, String templateName, Map<String, Object> data)
+            throws IOException {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_34);
+        cfg.setClassLoaderForTemplateLoading(WebServer.class.getClassLoader(), "templates");
+        cfg.setDefaultEncoding("UTF-8");
+
+        Template template = cfg.getTemplate(templateName);
+        StringWriter writer = new StringWriter();
+        try {
+            template.process(data, writer);
+        } catch (TemplateException e) {
+            e.printStackTrace();
+        }
+
+        response.setContentType("text/html;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().println(writer.toString());
     }
 
     /**
@@ -53,10 +87,41 @@ public class WebServer extends AbstractHandler {
             response.setContentType("text/html;charset=utf-8");
 
             if ("/".equals(target) && "GET".equalsIgnoreCase(request.getMethod())) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().println("CI Server is up and running");
+                // create list of builds
+                List<Build> builds = new ArrayList<>();
+
+                // get builds from database
+                builds = database.getBuilds();
+
+                // put into data model that freemarker can use
+                Map<String, Object> model = new HashMap<>();
+                model.put("builds", builds);
+
+                // render template
+                renderTemplate(response, "index.ftl", model);
             } else if ("/webhook".equals(target) && "POST".equalsIgnoreCase(request.getMethod())) {
                 handleWebhook(request, response);
+            } else if (target.matches("/build/\\d+")) {
+                // get the build ID from the URL
+                String[] parts = target.split("/");
+                Long id = Long.parseLong(parts[2]);
+
+                // get the build from the database
+                Build build = database.getBuild(id);
+
+                // if build is found, render the template
+                if (build != null) {
+                    Map<String, Object> model = new HashMap<>();
+                    model.put("build", build);
+
+                    // just display the log as plain text
+                    response.setContentType("text/plain;charset=utf-8");
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().println(build.getBuildLog());
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().println("<img src='https://http.cat/404' alt='404 not found' />");
+                }
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().println("<img src='https://http.cat/404' alt='404 not found' />");
@@ -70,13 +135,6 @@ public class WebServer extends AbstractHandler {
         }
     }
 
-    /**
-     * Handle incoming webhook from GitHub.
-     * 
-     * @param request  (HttpServletRequest) The HTTP request
-     * @param response (HttpServletResponse) The HTTP response
-     * @throws IOException If an input or output exception occurs.
-     */
     private void handleWebhook(HttpServletRequest request, HttpServletResponse response) {
         try {
             // get event type from environment variable
@@ -168,6 +226,9 @@ public class WebServer extends AbstractHandler {
             // run tests and get result
             path = project.cloneRepo();
             Boolean isSuccess = project.runMavenTests(path);
+
+            // store build result in database
+            database.insertBuild(checkId, commitHash, project.getLog());
 
             // set status to complete on GitHub
             sbr.setStatusComplete(commitHash, owner, repo, isSuccess, checkId);

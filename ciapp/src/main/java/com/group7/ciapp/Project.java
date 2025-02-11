@@ -17,6 +17,7 @@ public class Project {
     private Long checkId;
     private String path;
     private ProcessExecutor processExecutor;
+    private String log;
 
     /**
      * Sets the URL, commit hash and check-ID of the repository.
@@ -120,6 +121,7 @@ public class Project {
             String line;
             while ((line = in.readLine()) != null) {
                 System.out.println(line);
+                log += line + "\n";
             }
 
             exitcode = process.waitFor(); // wait for process to finish running tests
@@ -136,6 +138,15 @@ public class Project {
             System.out.println("Tests did not pass");
             return false;
         }
+    }
+
+    /**
+     * Set the log of the project.
+     * 
+     * @return (String) The log of the project.
+     */
+    public String getLog() {
+        return log;
     }
 
 }
