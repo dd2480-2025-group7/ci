@@ -27,8 +27,9 @@ public class App {
         // check that required environment variables are set
         // PRIVATE_KEY_PATH and APP_ID
         if (System.getenv("PRIVATE_KEY_PATH") == null || System.getenv("APP_ID") == null
-                || System.getenv("DATABASE_PATH") == null) {
-            System.out.println("Please set the environment variables PRIVATE_KEY_PATH, APP_ID and DATABASE_PATH");
+                || System.getenv("DATABASE_PATH") == null || System.getenv("BASE_URL") == null) {
+            System.out.println(
+                    "Please set the environment variables PRIVATE_KEY_PATH, APP_ID and DATABASE_PATH and BASE_URL");
             System.exit(1);
         }
 
