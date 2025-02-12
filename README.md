@@ -38,7 +38,7 @@ BASE_URL = "The base url for the webserver"
 ```
 
 ## API documentation
-The API documentation can be found in the file [index.html](). 
+The API documentation can be found at [index.html](https://dd2480-2025-group7.github.io/ci/). 
 
 You can also regenerate the API documentation yourself. To generate the API documentation move to the ciapp directory and run.
 ```bash
