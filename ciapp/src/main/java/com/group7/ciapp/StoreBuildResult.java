@@ -91,11 +91,12 @@ public class StoreBuildResult {
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.github_token);
         request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         String jsonBody = "{"
+                + "\"details_url\": " + System.getenv("BASE_URL") + "/build/" + checkID + ","
                 + "\"status\": \"completed\","
                 + "\"conclusion\": \"" + ((isSuccess) ? "success" : "failure") + "\","
                 + "\"output\": {"
                 + "   \"title\": \"Build " + ((isSuccess) ? "success" : "failure") + "\","
-                + "   \"summary\": \"The build and tests passed successfully.\""
+                + "   \"summary\": \"The build and tests " + ((isSuccess) ? "passed sucessfully." : "failed, see logs for further details.") + "\""
                 + "}"
                 + "}";
         request.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
