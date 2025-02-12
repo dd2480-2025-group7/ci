@@ -15,3 +15,4 @@ services:
       - PRIVATE_KEY_PATH=/usr/app/private-key.pem
       - DATABASE_PATH=/usr/app/database.db
       - APP_ID=${APP_ID} # read from .env file
+      - BASE_URL=${BASE_URL} # read from .env file
