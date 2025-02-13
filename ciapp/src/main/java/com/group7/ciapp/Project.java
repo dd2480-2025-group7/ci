@@ -86,6 +86,8 @@ public class Project {
         } else {
             throw new Exception("Error deleting repo: path does not exist");
         }
+
+        throw new Exception("test");
     }
 
     /**
